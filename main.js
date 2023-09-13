@@ -55,11 +55,15 @@ class Main {
         });
       }
 
-    async start(symbol2){
+    async start(symbol2 = "BTC-DAI"){
 
         while (true){
 
             console.log("...")
+            var fprice = function () { return true; };
+            var fil = function () { return true; };
+            let Exchanges = ["Bittrex", "HitBTC", "Binance"];
+
            
             let [BittrexPriceList, HitBTCPriceList, BinancePriceList] = await Promise.all([
                 
@@ -70,80 +74,54 @@ class Main {
                 
             ]);
 
-            // console.log(BittrexPriceList, HitBTCPriceList);
+            Object.defineProperty(fprice, `BittrexPriceList`, {value: BittrexPriceList, writable: true});
+            Object.defineProperty(fprice, `HitBTCPriceList`, {value: HitBTCPriceList, writable: true});
+            Object.defineProperty(fprice, `BinancePriceList`, {value: BinancePriceList, writable: true});
 
-            let unionSymbol = _.intersection(BittrexPriceList.symbol, HitBTCPriceList.symbol, BinancePriceList.symbol);
+
+            let unionSymbol = _.intersection(BittrexPriceList.symbol, HitBTCPriceList.symbol);
 
             console.log("111", unionSymbol)
 
-            // let found = _.findIndex(unionSymbol, (e) => {
-            //     return e == symbol2;
-            // }, 0);
+            let found = _.findIndex(unionSymbol, (e) => {
+                return e == symbol2;
+            }, 0);
 
-            // if (found < 0){
-            //     this.sleep(5)
-            //     return
-            // }
+            if (found < 0){
+                await this.sleep(5000)
+                return
+            }
 
-            let filteredBittrexPriceList = {
-                symbol: [], asks: [], bids: []
-            }
-            let filteredHitBTCPriceList = {
-                symbol: [], asks: [], bids: []
-            }
-            let filteredBinancePriceList = {
-                symbol: [], asks: [], bids: []
+
+            for (var index = 0; index < Exchanges.length; index++) {
+                const exchange = Exchanges[index];
+                Object.defineProperty(fil, `filtered${exchange}PriceList`, {value: {
+                  symbol: [], asks: [], bids: []
+                 }, writable: true});
             }
 
             for (var index = 0; index < unionSymbol.length; index++) {
                 var symbol = unionSymbol[index]
 
-                let indexBittrex = _.findIndex(BittrexPriceList.symbol, (e) => {
-                    return e == symbol;
-                }, 0);
-
-                filteredBittrexPriceList.symbol.push(symbol)
-                filteredBittrexPriceList.asks.push(BittrexPriceList.BittrexAskPrice[indexBittrex])
-                filteredBittrexPriceList.bids.push(BittrexPriceList.BittrexBidPrice[indexBittrex])
-
-                let indexHitBTC = _.findIndex(HitBTCPriceList.symbol, (e) => {
-                    return e == symbol;
-                }, 0);
-
-                filteredHitBTCPriceList.symbol.push(symbol)
-                filteredHitBTCPriceList.asks.push(HitBTCPriceList.HitBTCAskPrice[indexHitBTC])
-                filteredHitBTCPriceList.bids.push(HitBTCPriceList.HitBTCBidPrice[indexHitBTC])
-
-                let indexBinance = _.findIndex(BinancePriceList.symbol, (e) => {
-                    return e == symbol;
-                }, 0);
-
-                filteredBinancePriceList.symbol.push(symbol)
-                filteredBinancePriceList.asks.push(BinancePriceList.BinanceAskPrice[indexBinance])
-                filteredBinancePriceList.bids.push(BinancePriceList.BinanceBidPrice[indexBinance])
-
+                for (var index2 = 0; index2 < Exchanges.length; index2++) {
+                    var exchange = Exchanges[index2];
+                    let foundIndex = _.findIndex(fprice[`${exchange}PriceList`].symbol, (e) => {
+                      return e == symbol;
+                    }, 0)
+                    fil[`filtered${exchange}PriceList`].symbol.push(symbol)
+                    fil[`filtered${exchange}PriceList`].asks.push(fprice[`${exchange}PriceList`].AskPrice[foundIndex])
+                    fil[`filtered${exchange}PriceList`].bids.push(fprice[`${exchange}PriceList`].BidPrice[foundIndex])
+                }
             }
 
-            console.log(filteredBittrexPriceList, filteredHitBTCPriceList, filteredBinancePriceList)
+            for (var index = 0; index < Exchanges.length; index++) {
+              var exchange = Exchanges[index];
+              console.log(fil[`filtered${exchange}PriceList`])
+              
+            }
 
-            // let indexBittrex = _.findIndex(BittrexPriceList.symbol, (e) => {
-            //     return e == symbol;
-            // }, 0);
 
-            // let indexHitBTC = _.findIndex(HitBTCPriceList.symbol, (e) => {
-            //     return e == symbol;
-            // }, 0);
-
-            // let bittrexAsk = BittrexPriceList.BittrexAskPrice[indexBittrex];
-            // let hitbtcAsk = HitBTCPriceList.HitBTCAskPrice[indexHitBTC]
-
-            // let bittrexBid = BittrexPriceList.BittrexBidPrice[indexBittrex];
-            // let hitbtcBid = HitBTCPriceList.HitBTCBidPrice[indexHitBTC]
-
-            // let lowestAsk = Math.min(bittrexAsk, hitbtcAsk);
-            // let highestBid = Math.max(bittrexBid, hitbtcBid);
-
-            this.sleep(5000)
+            await this.sleep(5000)
          }
         
     }

@@ -275,8 +275,8 @@ class BinanceAPI {
         const BinancePriceList = {
             symbol: markets2,
             symbol2: markets2,
-            BinanceAskPrice: asks2,
-            BinanceBidPrice: bids2,
+            AskPrice: asks2,
+            BidPrice: bids2,
         };
 
         return BinancePriceList;

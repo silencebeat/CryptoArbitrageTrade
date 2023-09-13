@@ -253,8 +253,8 @@ class HITBTCAPI {
             const HitBTCPriceList = {
                 symbol: markets3,
                 symbol2: markets3,
-                HitBTCAskPrice: asks,
-                HitBTCBidPrice: bids,
+                AskPrice: asks,
+                BidPrice: bids,
             };
     
             return HitBTCPriceList;

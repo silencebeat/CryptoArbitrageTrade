@@ -279,8 +279,8 @@ class BitrexAPI {
         const BittrexPriceList = {
             symbol: markets3,
             symbol2: markets3,
-            BittrexAskPrice: asks,
-            BittrexBidPrice: bids,
+            AskPrice: asks,
+            BidPrice: bids,
         };
 
         return BittrexPriceList;
