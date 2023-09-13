@@ -3,6 +3,7 @@ const ConnectToBinanceAPI = require("./BinanceAPI")
 const ConnectToBittrexAPI = require("./BittrexAPI")
 const ConnectToHitBTCAPI = require("./HitBTCAPI")
 const nodemailer = require('nodemailer');
+const _ = require("lodash")
 
 const CumulativeInvestment = 10;
 const BTCMin = 0; // 0.00334519  // around 30 dollars
@@ -54,31 +55,96 @@ class Main {
         });
       }
 
-    async start(){
+    async start(symbol2){
 
-        // while (true){
+        while (true){
+
+            console.log("...")
            
-            const Exchanges = ["Bittrex", "HitBTC"];
-
-            let [BittrexPriceList, HitBTCPriceList] = await Promise.all([
+            let [BittrexPriceList, HitBTCPriceList, BinancePriceList] = await Promise.all([
                 
                 
                 ConnectToBittrexAPI.populateBittrexPriceList(),
                 ConnectToHitBTCAPI.populateHitBTCPriceList(),
-                // ConnectToBinanceAPI.populateBinancePriceList()
+                ConnectToBinanceAPI.populateBinancePriceList()
                 
             ]);
 
-            console.log(BittrexPriceList, HitBTCPriceList)
+            // console.log(BittrexPriceList, HitBTCPriceList);
 
-            // const BittrexPriceList = {
-            //     symbol: [],
-            //     symbol2: [],
-            //     BittrexAskPrice: [],
-            //     BittrexBidPrice: [],
-            // };
+            let unionSymbol = _.intersection(BittrexPriceList.symbol, HitBTCPriceList.symbol, BinancePriceList.symbol);
 
-        // }
+            console.log("111", unionSymbol)
+
+            // let found = _.findIndex(unionSymbol, (e) => {
+            //     return e == symbol2;
+            // }, 0);
+
+            // if (found < 0){
+            //     this.sleep(5)
+            //     return
+            // }
+
+            let filteredBittrexPriceList = {
+                symbol: [], asks: [], bids: []
+            }
+            let filteredHitBTCPriceList = {
+                symbol: [], asks: [], bids: []
+            }
+            let filteredBinancePriceList = {
+                symbol: [], asks: [], bids: []
+            }
+
+            for (var index = 0; index < unionSymbol.length; index++) {
+                var symbol = unionSymbol[index]
+
+                let indexBittrex = _.findIndex(BittrexPriceList.symbol, (e) => {
+                    return e == symbol;
+                }, 0);
+
+                filteredBittrexPriceList.symbol.push(symbol)
+                filteredBittrexPriceList.asks.push(BittrexPriceList.BittrexAskPrice[indexBittrex])
+                filteredBittrexPriceList.bids.push(BittrexPriceList.BittrexBidPrice[indexBittrex])
+
+                let indexHitBTC = _.findIndex(HitBTCPriceList.symbol, (e) => {
+                    return e == symbol;
+                }, 0);
+
+                filteredHitBTCPriceList.symbol.push(symbol)
+                filteredHitBTCPriceList.asks.push(HitBTCPriceList.HitBTCAskPrice[indexHitBTC])
+                filteredHitBTCPriceList.bids.push(HitBTCPriceList.HitBTCBidPrice[indexHitBTC])
+
+                let indexBinance = _.findIndex(BinancePriceList.symbol, (e) => {
+                    return e == symbol;
+                }, 0);
+
+                filteredBinancePriceList.symbol.push(symbol)
+                filteredBinancePriceList.asks.push(BinancePriceList.BinanceAskPrice[indexBinance])
+                filteredBinancePriceList.bids.push(BinancePriceList.BinanceBidPrice[indexBinance])
+
+            }
+
+            console.log(filteredBittrexPriceList, filteredHitBTCPriceList, filteredBinancePriceList)
+
+            // let indexBittrex = _.findIndex(BittrexPriceList.symbol, (e) => {
+            //     return e == symbol;
+            // }, 0);
+
+            // let indexHitBTC = _.findIndex(HitBTCPriceList.symbol, (e) => {
+            //     return e == symbol;
+            // }, 0);
+
+            // let bittrexAsk = BittrexPriceList.BittrexAskPrice[indexBittrex];
+            // let hitbtcAsk = HitBTCPriceList.HitBTCAskPrice[indexHitBTC]
+
+            // let bittrexBid = BittrexPriceList.BittrexBidPrice[indexBittrex];
+            // let hitbtcBid = HitBTCPriceList.HitBTCBidPrice[indexHitBTC]
+
+            // let lowestAsk = Math.min(bittrexAsk, hitbtcAsk);
+            // let highestBid = Math.max(bittrexBid, hitbtcBid);
+
+            this.sleep(5000)
+         }
         
     }
 

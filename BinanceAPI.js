@@ -237,14 +237,14 @@ class BinanceAPI {
             let data = await this.requestPublic('/api/v1/ticker/24hr', {
             })
 
-            const [coin, status] = await this.getBinanceCoinStatus();
+            const [coin, status] = await this.getBinanceTradingStatus();
 
             for (let i = 0; i < data.length; i++) {
                 let cont = false;
     
                 try {
                     for (let j = 0; j < coin.length; j++) {
-                        if (coin[j] && data[i].symbol.includes(coin[j]) && status[j] === false) {
+                        if (coin[j] && data[i].symbol.includes(coin[j]) && status[j] === "TRADING") {
                             cont = true;
                             break;
                         }

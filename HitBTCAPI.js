@@ -253,8 +253,8 @@ class HITBTCAPI {
             const HitBTCPriceList = {
                 symbol: markets3,
                 symbol2: markets3,
-                BittrexAskPrice: asks,
-                BittrexBidPrice: bids,
+                HitBTCAskPrice: asks,
+                HitBTCBidPrice: bids,
             };
     
             return HitBTCPriceList;
