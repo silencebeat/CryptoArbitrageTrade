@@ -249,7 +249,7 @@ class BitrexAPI {
                     const [Coin1, Coin2] = marketName.split('-');
                     
                     for (let j = 0; j < bittcoin.length; j++) {
-                        if (bittcoin[j] && marketName.includes(bittcoin[j]) && bitstatus[j] === false) {
+                        if (bittcoin[j] && marketName.includes(bittcoin[j]) && bitstatus[j] === "ONLINE") {
                             cont = true;
                             break;
                         }

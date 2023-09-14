@@ -79,7 +79,7 @@ class Main {
             Object.defineProperty(fprice, `BinancePriceList`, {value: BinancePriceList, writable: true});
 
 
-            let unionSymbol = _.intersection(BittrexPriceList.symbol, HitBTCPriceList.symbol);
+            let unionSymbol = _.intersection(BittrexPriceList.symbol, HitBTCPriceList.symbol, BinancePriceList.symbol);
 
             console.log("111", unionSymbol)
 
@@ -89,7 +89,7 @@ class Main {
 
             if (found < 0){
                 await this.sleep(5000)
-                return
+                continue;
             }
 
 
